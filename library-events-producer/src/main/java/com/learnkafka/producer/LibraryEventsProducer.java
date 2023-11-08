@@ -64,8 +64,7 @@ public class LibraryEventsProducer {
                     } else {
                         handleSuccess(key, value ,sendResult);
                     }
-                })
-                ;
+                });
     }
 
     private ProducerRecord<Integer, String> buildProducerRecord (Integer key, String value) {
@@ -76,7 +75,7 @@ public class LibraryEventsProducer {
     public SendResult<Integer, String> sendLibraryEvents_approach2(LibraryEvent libraryEvent) throws JsonProcessingException, ExecutionException, InterruptedException, TimeoutException {
         var key = libraryEvent.libraryEventId();
         var value = objectMapper.writeValueAsString(libraryEvent);
-
+        
         var sendResult =  kafkaTemplate.send(topic, key, value).get(3, TimeUnit.SECONDS);
         handleSuccess(key, value ,sendResult);
         return sendResult;

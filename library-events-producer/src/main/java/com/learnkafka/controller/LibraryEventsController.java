@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,5 +39,27 @@ public class LibraryEventsController {
         log.info("After sending libraryEvents: ");
 
         return ResponseEntity.status(HttpStatus.CREATED).body(libraryEvent);
+    }
+    @PutMapping("/v1/libraryevent")
+    public ResponseEntity<?> updateLibraryEvent(
+            @RequestBody LibraryEvent libraryEvent
+    ) throws JsonProcessingException, ExecutionException, InterruptedException, TimeoutException {
+        log.info("libraryevent: {}", libraryEvent);
+        ResponseEntity<String> BAD_REQUEST = validateLibraryEvent(libraryEvent);
+        if (BAD_REQUEST != null) return BAD_REQUEST;
+        
+        libraryEventsProducer.sendLibraryEvents_approach3(libraryEvent);
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(libraryEvent);
+    }
+    
+    private static ResponseEntity<String> validateLibraryEvent (LibraryEvent libraryEvent) {
+        if (libraryEvent.libraryEventId() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please pass the LibraryEventId");
+        }
+        if (!libraryEvent.libraryEventType().equals(LibraryEventType.UPDATE)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Only UPDATE event type is supported");
+        }
+        return null;
     }
 }
