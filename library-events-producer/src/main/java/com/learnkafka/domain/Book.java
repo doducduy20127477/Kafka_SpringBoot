@@ -1,7 +1,7 @@
 package com.learnkafka.domain;
 
 public record Book(
-        Integer BookId,
+        Integer bookId,
         String bookName,
         String bookAuthor
 
